@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		11806CF59FF2416D8A071362 /* SettingsOpener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FADCF986251470C97214381 /* SettingsOpener.swift */; };
+		F1A2B3C4D5E6478901234567 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E2B3C4D5E6F7489012345678 /* Assets.xcassets */; };
 		192B0BBE26D6435188A2AC37 /* PlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 909665F0E17741AC9B7E328D /* PlayerViewModel.swift */; };
 		317E0F925187496EA5603F33 /* LyricsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6244C5B9784C7BB7CA0040 /* LyricsWindowController.swift */; };
 		32B49705FDE94B45AA40A11C /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B96DE51FEBB453485E5F55B /* MenuBarView.swift */; };
@@ -56,6 +57,7 @@
 		AF16231FF64445C787D703E2 /* ConnectSpotifyExplanationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectSpotifyExplanationView.swift; sourceTree = "<group>"; };
 		C6C5B1138AC14F6D927D077E /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		D3BEE7CAE4BD4E2AADD5F64F /* LyricalApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricalApp.swift; sourceTree = "<group>"; };
+		E2B3C4D5E6F7489012345678 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +75,7 @@
 			isa = PBXGroup;
 			children = (
 				8BB1FAFA87544E7BA0DAE479 /* Lyrical */,
+				C4D5E6F7A899887766554433 /* Resources */,
 				B67A0009C3D44846A157B7AC /* Config */,
 				95359A93B7C34C2CBCD5D6D3 /* Info.plist */,
 				9441463100B14C5DAF13B43F /* Products */,
@@ -173,6 +176,14 @@
 			path = App;
 			sourceTree = "<group>";
 		};
+		C4D5E6F7A899887766554433 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				E2B3C4D5E6F7489012345678 /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -182,6 +193,7 @@
 			buildPhases = (
 				8AE8A3FDBFB144C3A91306ED /* Sources */,
 				C2DE3BBCE9254694B58B76C9 /* Frameworks */,
+				D3C4B5A69788796060505040 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -256,12 +268,26 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXResourcesBuildPhase section */
+		D3C4B5A69788796060505040 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F1A2B3C4D5E6478901234567 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin XCBuildConfiguration section */
 		0D473C3BD2324D3E89F1BAFB /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 68D5E5F0CE2F49BE925E822A /* Shared.xcconfig */;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				DEVELOPMENT_TEAM = KXC4J85K2K;
+				INFOPLIST_KEY_CFBundleDisplayName = "Lyrics Anywhere";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -310,7 +336,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 68D5E5F0CE2F49BE925E822A /* Shared.xcconfig */;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				DEVELOPMENT_TEAM = KXC4J85K2K;
+				INFOPLIST_KEY_CFBundleDisplayName = "Lyrics Anywhere";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
