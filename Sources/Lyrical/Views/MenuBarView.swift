@@ -54,6 +54,10 @@ struct MenuBarView: View {
             Text("Finish signing in in your browser…")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
+        } else if !viewModel.auth.isAuthenticated {
+            Text("Connect Spotify to begin")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
         } else {
             Text(viewModel.statusMessage)
                 .font(.subheadline)
@@ -77,13 +81,13 @@ struct MenuBarView: View {
         }
 
         Button("Settings…") {
-            SettingsOpener.open()
+            SettingsOpener.open(viewModel: viewModel)
         }
         .keyboardShortcut(",", modifiers: .command)
 
         Divider()
 
-        Button("Quit Lyrical") {
+        Button("Quit Lyrics Anywhere") {
             NSApplication.shared.terminate(nil)
         }
     }

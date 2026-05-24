@@ -104,8 +104,17 @@ final class SpotifyAuthService: ObservableObject {
     func disconnect() {
         KeychainHelper.deleteAll()
         UserDefaults.standard.set(false, forKey: Storage.sessionEnabled)
+        invalidateSession()
+    }
+
+    private func invalidateSession() {
         isAuthenticated = false
         isAwaitingBrowserSignIn = false
+    }
+
+    /// Clears stored tokens when the session can no longer be used.
+    func clearInvalidSession() {
+        disconnect()
     }
 
     func accessToken() async throws -> String {
@@ -146,11 +155,18 @@ final class SpotifyAuthService: ObservableObject {
         }
     }
 
+    /// Clears a stale access token and fetches a new one using the refresh token.
+    func forceRefreshAccessToken() async throws -> String {
+        KeychainHelper.delete(account: .accessToken)
+        return try await refreshTokenIfNeeded()
+    }
+
     func refreshTokenIfNeeded() async throws -> String {
         if let token = KeychainHelper.read(account: .accessToken) {
             return token
         }
         guard let refresh = KeychainHelper.read(account: .refreshToken) else {
+            clearInvalidSession()
             throw SpotifyError.notAuthenticated
         }
 
@@ -170,7 +186,7 @@ final class SpotifyAuthService: ObservableObject {
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
-            disconnect()
+            clearInvalidSession()
             throw SpotifyError.notAuthenticated
         }
         let json = try JSONDecoder().decode(TokenResponse.self, from: data)

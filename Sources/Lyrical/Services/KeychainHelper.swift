@@ -7,8 +7,8 @@ enum KeychainAccount: String {
 
     var label: String {
         switch self {
-        case .accessToken: "Lyrical — Spotify session"
-        case .refreshToken: "Lyrical — Spotify stay signed in"
+        case .accessToken: "Lyrics Anywhere — Spotify session"
+        case .refreshToken: "Lyrics Anywhere — Spotify stay signed in"
         }
     }
 }
@@ -18,7 +18,7 @@ enum KeychainHelper {
     private static let service = "com.lyrical.app.spotify-session"
     private static let legacyService = "com.lyrical.spotify"
     private static let description =
-        "Stores Spotify login tokens so Lyrical can read the current song and show synced lyrics. Your Spotify password is never saved."
+        "Stores Spotify login tokens so Lyrics Anywhere can read the current song and show synced lyrics. Your Spotify password is never saved."
 
     static func save(_ value: String, account: KeychainAccount) {
         store(value, account: account)

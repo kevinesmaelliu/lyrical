@@ -4,5 +4,8 @@
 xcuserdata/
 DerivedData/
 *.app
+build/
+Resources/Assets.xcassets/AppIcon.appiconset/*.png
+Lyrics Anywhere.dmg
 .env
 Config/Secrets.xcconfig

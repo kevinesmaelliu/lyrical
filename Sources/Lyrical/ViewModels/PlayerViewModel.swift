@@ -1,6 +1,7 @@
 import AppKit
 import Combine
 import Foundation
+import SwiftUI
 
 @MainActor
 final class PlayerViewModel: ObservableObject {
@@ -10,7 +11,13 @@ final class PlayerViewModel: ObservableObject {
     @Published var statusMessage: String = "Connect Spotify to begin"
     @Published var showLyricsWindow = true
     @Published var fontSize: Double = 17
-    @Published var windowOpacity: Double
+    @Published var backgroundOpacity: Double
+    @Published var borderOpacity: Double
+    @Published var textOpacity: Double
+    @Published var useSystemTextColor: Bool
+    @Published var customTextRed: Double
+    @Published var customTextGreen: Double
+    @Published var customTextBlue: Double
     @Published var windowWidthScale: Double
     @Published var windowHeightScale: Double
     @Published var contextLinesBefore: Int
@@ -19,7 +26,13 @@ final class PlayerViewModel: ObservableObject {
     @Published var menuBarArtwork: NSImage?
 
     private enum Defaults {
-        static let opacity = "lyricsWindowOpacity"
+        static let backgroundOpacity = "lyricsWindowOpacity"
+        static let borderOpacity = "lyricsWindowBorderOpacity"
+        static let textOpacity = "lyricsTextOpacity"
+        static let useSystemTextColor = "lyricsUseSystemTextColor"
+        static let textColorRed = "lyricsTextColorRed"
+        static let textColorGreen = "lyricsTextColorGreen"
+        static let textColorBlue = "lyricsTextColorBlue"
         static let scale = "lyricsWindowScale"
         static let widthScale = "lyricsWindowWidthScale"
         static let heightScale = "lyricsWindowHeightScale"
@@ -42,14 +55,30 @@ final class PlayerViewModel: ObservableObject {
         self.auth = auth
         self.player = SpotifyPlayerService(auth: auth)
 
-        let storedOpacity = UserDefaults.standard.object(forKey: Defaults.opacity) as? Double
-        self.windowOpacity = storedOpacity ?? 0.92
+        let storedOpacity = UserDefaults.standard.object(forKey: Defaults.backgroundOpacity) as? Double
+        self.backgroundOpacity = Self.clampedOpacity(storedOpacity ?? 0.92)
+
+        let storedBorderOpacity = UserDefaults.standard.object(forKey: Defaults.borderOpacity) as? Double
+        self.borderOpacity = Self.clampedBorderOpacity(storedBorderOpacity ?? 0.08)
+
+        let storedTextOpacity = UserDefaults.standard.object(forKey: Defaults.textOpacity) as? Double
+        self.textOpacity = Self.clampedOpacity(storedTextOpacity ?? 1)
+
+        if UserDefaults.standard.object(forKey: Defaults.useSystemTextColor) != nil {
+            self.useSystemTextColor = UserDefaults.standard.bool(forKey: Defaults.useSystemTextColor)
+        } else {
+            self.useSystemTextColor = true
+        }
+
+        self.customTextRed = UserDefaults.standard.object(forKey: Defaults.textColorRed) as? Double ?? 1
+        self.customTextGreen = UserDefaults.standard.object(forKey: Defaults.textColorGreen) as? Double ?? 1
+        self.customTextBlue = UserDefaults.standard.object(forKey: Defaults.textColorBlue) as? Double ?? 1
 
         let legacyScale = UserDefaults.standard.object(forKey: Defaults.scale) as? Double
         let storedWidth = UserDefaults.standard.object(forKey: Defaults.widthScale) as? Double
         let storedHeight = UserDefaults.standard.object(forKey: Defaults.heightScale) as? Double
-        self.windowWidthScale = storedWidth ?? legacyScale ?? 1.0
-        self.windowHeightScale = storedHeight ?? legacyScale ?? 1.0
+        self.windowWidthScale = Self.clampedWidthScale(storedWidth ?? legacyScale ?? 1.0)
+        self.windowHeightScale = Self.clampedHeightScale(storedHeight ?? legacyScale ?? 1.0)
 
         let storedLinesBefore = UserDefaults.standard.object(forKey: Defaults.linesBefore) as? Int
         self.contextLinesBefore = storedLinesBefore ?? 1
@@ -82,18 +111,47 @@ final class PlayerViewModel: ObservableObject {
             }
             .store(in: &cancellables)
 
-        $windowOpacity
+        $backgroundOpacity
             .dropFirst()
-            .sink { UserDefaults.standard.set($0, forKey: Defaults.opacity) }
+            .map { Self.clampedOpacity($0) }
+            .sink { UserDefaults.standard.set($0, forKey: Defaults.backgroundOpacity) }
+            .store(in: &cancellables)
+
+        $borderOpacity
+            .dropFirst()
+            .map { Self.clampedBorderOpacity($0) }
+            .sink { UserDefaults.standard.set($0, forKey: Defaults.borderOpacity) }
+            .store(in: &cancellables)
+
+        $textOpacity
+            .dropFirst()
+            .map { Self.clampedOpacity($0) }
+            .sink { UserDefaults.standard.set($0, forKey: Defaults.textOpacity) }
+            .store(in: &cancellables)
+
+        $useSystemTextColor
+            .dropFirst()
+            .sink { UserDefaults.standard.set($0, forKey: Defaults.useSystemTextColor) }
+            .store(in: &cancellables)
+
+        Publishers.CombineLatest3($customTextRed, $customTextGreen, $customTextBlue)
+            .dropFirst()
+            .sink { red, green, blue in
+                UserDefaults.standard.set(red, forKey: Defaults.textColorRed)
+                UserDefaults.standard.set(green, forKey: Defaults.textColorGreen)
+                UserDefaults.standard.set(blue, forKey: Defaults.textColorBlue)
+            }
             .store(in: &cancellables)
 
         $windowWidthScale
             .dropFirst()
+            .map { Self.clampedWidthScale($0) }
             .sink { UserDefaults.standard.set($0, forKey: Defaults.widthScale) }
             .store(in: &cancellables)
 
         $windowHeightScale
             .dropFirst()
+            .map { Self.clampedHeightScale($0) }
             .sink { UserDefaults.standard.set($0, forKey: Defaults.heightScale) }
             .store(in: &cancellables)
 
@@ -114,6 +172,37 @@ final class PlayerViewModel: ObservableObject {
     }
 
     private var cancellables = Set<AnyCancellable>()
+
+    private static func clampedOpacity(_ value: Double) -> Double {
+        min(1, max(0, value))
+    }
+
+    private static func clampedBorderOpacity(_ value: Double) -> Double {
+        clampedOpacity(value)
+    }
+
+    private static func clampedWidthScale(_ value: Double) -> Double {
+        min(2, max(0.2, value))
+    }
+
+    private static func clampedHeightScale(_ value: Double) -> Double {
+        min(2.5, max(0.2, value))
+    }
+
+    var lyricsTextColor: Color {
+        if useSystemTextColor {
+            return .primary
+        }
+        return Color(red: customTextRed, green: customTextGreen, blue: customTextBlue)
+    }
+
+    func setCustomTextColor(_ color: Color) {
+        guard let rgb = NSColor(color).usingColorSpace(.deviceRGB) else { return }
+        useSystemTextColor = false
+        customTextRed = Double(rgb.redComponent)
+        customTextGreen = Double(rgb.greenComponent)
+        customTextBlue = Double(rgb.blueComponent)
+    }
 
     func startPolling() {
         stopPolling()
@@ -159,6 +248,8 @@ final class PlayerViewModel: ObservableObject {
 
             let progress = currentProgress(for: track)
             activeLineIndex = LRCParser.activeLineIndex(in: lyricLines, at: progress)
+        } catch SpotifyError.notAuthenticated {
+            auth.clearInvalidSession()
         } catch {
             nowPlaying = nil
             lyricLines = []

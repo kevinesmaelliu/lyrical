@@ -19,15 +19,14 @@ final class LyricsWindowController: NSObject {
             }
             .store(in: &cancellables)
 
-        Publishers.CombineLatest4(
+        Publishers.CombineLatest3(
             viewModel.$windowPlacement,
             viewModel.$windowWidthScale,
-            viewModel.$windowHeightScale,
-            viewModel.$windowOpacity
+            viewModel.$windowHeightScale
         )
         .dropFirst()
         .receive(on: RunLoop.main)
-        .sink { [weak self] _, _, _, _ in
+        .sink { [weak self] _, _, _ in
             self?.applyLayout(animated: true)
         }
         .store(in: &cancellables)
@@ -95,7 +94,5 @@ final class LyricsWindowController: NSObject {
         } else {
             window.setFrame(frame, display: true)
         }
-
-        window.alphaValue = viewModel.windowOpacity
     }
 }

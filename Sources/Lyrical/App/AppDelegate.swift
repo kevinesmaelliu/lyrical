@@ -1,8 +1,10 @@
 import AppKit
 
+@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     var viewModel: PlayerViewModel?
-    var lyricsWindow: LyricsWindowController?
+    let lyricsController = LyricsWindowController()
+    let settingsController = SettingsWindowController()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.regular)

@@ -20,28 +20,24 @@ struct SettingsView: View {
         !effectiveClientID.isEmpty
     }
 
+    private var textColorBinding: Binding<Color> {
+        Binding(
+            get: { viewModel.lyricsTextColor },
+            set: { viewModel.setCustomTextColor($0) }
+        )
+    }
+
     var body: some View {
-        Form {
+        ScrollView {
+            Form {
             Section {
-                if isSpotifyConfigured {
-                    Label("Ready to connect", systemImage: "checkmark.circle.fill")
-                        .foregroundStyle(.green)
-                    Text("Sign in with your Spotify account below to show synced lyrics while you listen.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                } else {
+                if !isSpotifyConfigured {
                     TextField("Spotify Client ID", text: $clientID)
                         .textFieldStyle(.roundedBorder)
                     Text("Create a free app at [developer.spotify.com](https://developer.spotify.com/dashboard) and paste your Client ID here.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                }
-            } header: {
-                Text("Spotify")
-            }
-
-            Section {
-                if viewModel.auth.showConnectExplanation {
+                } else if viewModel.auth.showConnectExplanation {
                     ConnectSpotifyExplanationView(
                         onContinue: { viewModel.auth.confirmConnect() },
                         onCancel: { viewModel.auth.cancelConnectExplanation() }
@@ -69,10 +65,14 @@ struct SettingsView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 } else {
+                    Label("Ready to connect", systemImage: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                    Text("Sign in with your Spotify account to show synced lyrics while you listen.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                     Button("Connect Spotify") {
                         viewModel.auth.requestConnect()
                     }
-                    .disabled(!isSpotifyConfigured)
                 }
 
                 if let error = viewModel.auth.authError {
@@ -80,11 +80,13 @@ struct SettingsView: View {
                         .font(.caption)
                         .foregroundStyle(.red)
                 }
+            } header: {
+                Text("Spotify")
             }
 
             Section {
                 Text(
-                    "After you connect, Lyrical saves Spotify login tokens in the macOS Keychain so you stay signed in. Your Spotify password is never stored. Disconnect anytime to remove them."
+                    "After you connect, Lyrics Anywhere saves Spotify login tokens in the macOS Keychain so you stay signed in. Your Spotify password is never stored. Disconnect anytime to remove them."
                 )
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -113,20 +115,12 @@ struct SettingsView: View {
                     Text("Lines after current: \(viewModel.contextLinesAfter)")
                 }
 
-                Slider(value: $viewModel.windowWidthScale, in: 0.6...2.0, step: 0.05) {
+                Slider(value: $viewModel.windowWidthScale, in: 0.2...2.0, step: 0.05) {
                     Text("Window width")
                 }
 
-                Slider(value: $viewModel.windowHeightScale, in: 0.6...2.5, step: 0.05) {
+                Slider(value: $viewModel.windowHeightScale, in: 0.2...2.5, step: 0.05) {
                     Text("Window height")
-                }
-
-                Slider(value: $viewModel.windowOpacity, in: 0.25...1, step: 0.05) {
-                    Text("Transparency")
-                }
-
-                Slider(value: $viewModel.fontSize, in: 12...24, step: 1) {
-                    Text("Lyrics text size")
                 }
             } header: {
                 Text("Lyrics Window")
@@ -134,10 +128,50 @@ struct SettingsView: View {
                 Text("Snap the lyrics strip to any screen edge or corner. Increase height when showing more lines.")
                     .font(.caption)
             }
+
+            Section {
+                Slider(value: $viewModel.backgroundOpacity, in: 0...1, step: 0.05) {
+                    Text("Background transparency")
+                }
+
+                Slider(value: $viewModel.borderOpacity, in: 0...1, step: 0.05) {
+                    Text("Border opacity")
+                }
+            } header: {
+                Text("Background")
+            } footer: {
+                Text("Adjust the frosted panel and window outline.")
+                    .font(.caption)
+            }
+
+            Section {
+                Slider(value: $viewModel.fontSize, in: 6...48, step: 1) {
+                    Text("Lyrics text size")
+                }
+
+                Slider(value: $viewModel.textOpacity, in: 0...1, step: 0.05) {
+                    Text("Text opacity")
+                }
+
+                Toggle("Use system text color", isOn: $viewModel.useSystemTextColor)
+
+                ColorPicker(
+                    "Text color",
+                    selection: textColorBinding,
+                    supportsOpacity: false
+                )
+                .disabled(viewModel.useSystemTextColor)
+            } header: {
+                Text("Lyrics text")
+            } footer: {
+                Text("System color follows light and dark mode. Custom color applies to all lyric lines.")
+                    .font(.caption)
+            }
+            }
+            .formStyle(.grouped)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .formStyle(.grouped)
-        .frame(width: 440, height: 640)
-        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
@@ -166,6 +200,7 @@ private struct PlacementButton: View {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .strokeBorder(isSelected ? Color.accentColor : Color.primary.opacity(0.12), lineWidth: 1)
             }
+            .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         }
         .buttonStyle(.plain)
     }

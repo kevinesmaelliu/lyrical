@@ -43,6 +43,6 @@ struct MenuBarArtworkLabel: View {
         if let track = viewModel.nowPlaying {
             return "\(track.title) by \(track.artist)"
         }
-        return "Lyrical"
+        return "Lyrics Anywhere"
     }
 }

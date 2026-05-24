@@ -13,8 +13,12 @@ struct LyricsWindowView: View {
 
     var body: some View {
         ZStack {
-            VisualEffectBlur(material: .hudWindow, blendingMode: .behindWindow)
-                .ignoresSafeArea()
+            VisualEffectBlur(
+                material: .hudWindow,
+                blendingMode: .behindWindow,
+                opacity: viewModel.backgroundOpacity
+            )
+            .ignoresSafeArea()
 
             lyricsBody
                 .padding(.horizontal, 14 * viewModel.windowWidthScale)
@@ -23,7 +27,7 @@ struct LyricsWindowView: View {
         .clipShape(RoundedRectangle(cornerRadius: LyricsWindowMetrics.cornerRadius, style: .continuous))
         .overlay {
             RoundedRectangle(cornerRadius: LyricsWindowMetrics.cornerRadius, style: .continuous)
-                .strokeBorder(Color.primary.opacity(0.08), lineWidth: 1)
+                .strokeBorder(Color.primary.opacity(viewModel.borderOpacity), lineWidth: 1)
         }
         .frame(width: windowSize.width, height: windowSize.height)
     }
@@ -31,7 +35,7 @@ struct LyricsWindowView: View {
     @ViewBuilder
     private var lyricsBody: some View {
         if !viewModel.auth.isAuthenticated {
-            statusText(viewModel.statusMessage)
+            statusText("Connect Spotify to begin")
         } else if viewModel.nowPlaying == nil {
             statusText(viewModel.statusMessage)
         } else if viewModel.lyricLines.isEmpty {
@@ -41,6 +45,8 @@ struct LyricsWindowView: View {
                 lines: viewModel.lyricLines,
                 activeIndex: viewModel.activeLineIndex,
                 fontSize: viewModel.fontSize,
+                textColor: viewModel.lyricsTextColor,
+                textOpacity: viewModel.textOpacity,
                 linesBefore: viewModel.contextLinesBefore,
                 linesAfter: viewModel.contextLinesAfter
             )
@@ -62,6 +68,8 @@ struct CompactSyncedLyricsView: View {
     let lines: [LyricLine]
     let activeIndex: Int?
     let fontSize: Double
+    let textColor: Color
+    let textOpacity: Double
     let linesBefore: Int
     let linesAfter: Int
 
@@ -75,7 +83,7 @@ struct CompactSyncedLyricsView: View {
 
                 Text(lines[activeIndex].text)
                     .font(.system(size: fontSize, weight: .semibold))
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(textColor.opacity(textOpacity))
                     .lineLimit(2)
                     .minimumScaleFactor(0.75)
                     .multilineTextAlignment(.center)
@@ -88,7 +96,7 @@ struct CompactSyncedLyricsView: View {
             } else if let first = lines.first {
                 Text(first.text)
                     .font(.system(size: fontSize, weight: .medium))
-                    .foregroundStyle(.primary.opacity(0.6))
+                    .foregroundStyle(textColor.opacity(0.6 * textOpacity))
                     .lineLimit(2)
                     .multilineTextAlignment(.center)
             }
@@ -99,7 +107,7 @@ struct CompactSyncedLyricsView: View {
     private func contextLine(_ text: String, distance: Int) -> some View {
         Text(text)
             .font(.system(size: fontSize * 0.72, weight: .regular))
-            .foregroundStyle(.primary.opacity(contextOpacity(distance: distance)))
+            .foregroundStyle(textColor.opacity(contextOpacity(distance: distance) * textOpacity))
             .lineLimit(1)
             .multilineTextAlignment(.center)
     }
@@ -143,6 +151,7 @@ struct ArtworkView: View {
 struct VisualEffectBlur: NSViewRepresentable {
     let material: NSVisualEffectView.Material
     let blendingMode: NSVisualEffectView.BlendingMode
+    var opacity: Double = 1
 
     func makeNSView(context: Context) -> NSVisualEffectView {
         let view = NSVisualEffectView()
@@ -152,12 +161,14 @@ struct VisualEffectBlur: NSViewRepresentable {
         view.wantsLayer = true
         view.layer?.cornerRadius = LyricsWindowMetrics.cornerRadius
         view.layer?.masksToBounds = true
+        view.alphaValue = opacity
         return view
     }
 
     func updateNSView(_ nsView: NSVisualEffectView, context: Context) {
         nsView.material = material
         nsView.blendingMode = blendingMode
+        nsView.alphaValue = opacity
         nsView.layer?.cornerRadius = LyricsWindowMetrics.cornerRadius
     }
 }

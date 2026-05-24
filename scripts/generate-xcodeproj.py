@@ -89,8 +89,8 @@ def main() -> None:
             f'{{isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = {name}; sourceTree = "<group>"; }};'
         )
     w(
-        f'\t\t{I["product"]} /* Lyrical.app */ = '
-        f'{{isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lyrical.app; sourceTree = BUILT_PRODUCTS_DIR; }};'
+        f'\t\t{I["product"]} /* Lyrics Anywhere.app */ = '
+        f'{{isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Lyrics Anywhere.app"; sourceTree = BUILT_PRODUCTS_DIR; }};'
     )
     w(
         f'\t\t{I["infoPlist"]} /* Info.plist */ = '
@@ -165,7 +165,7 @@ def main() -> None:
     w(f'\t\t{I["productsGroup"]} /* Products */ = {{')
     w("\t\t\tisa = PBXGroup;")
     w("\t\t\tchildren = (")
-    w(f'\t\t\t\t{I["product"]} /* Lyrical.app */,')
+    w(f'\t\t\t\t{I["product"]} /* Lyrics Anywhere.app */,')
     w("\t\t\t);")
     w("\t\t\tname = Products;")
     w('\t\t\tsourceTree = "<group>";')
@@ -196,7 +196,7 @@ def main() -> None:
     w("\t\t\t);")
     w("\t\t\tname = Lyrical;")
     w("\t\t\tproductName = Lyrical;")
-    w(f'\t\t\tproductReference = {I["product"]} /* Lyrical.app */;')
+    w(f'\t\t\tproductReference = {I["product"]} /* Lyrics Anywhere.app */;')
     w('\t\t\tproductType = "com.apple.product-type.application";')
     w("\t\t};")
     w("/* End PBXNativeTarget section */")

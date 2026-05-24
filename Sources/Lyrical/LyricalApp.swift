@@ -5,8 +5,6 @@ struct LyricalApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var auth: SpotifyAuthService
     @StateObject private var viewModel: PlayerViewModel
-    @State private var lyricsController = LyricsWindowController()
-    @State private var settingsController = SettingsWindowController()
     @State private var didBootstrap = false
 
     init() {
@@ -25,12 +23,17 @@ struct LyricalApp: App {
                 }
         } label: {
             MenuBarArtworkLabel(viewModel: viewModel)
+                .onAppear {
+                    guard !didBootstrap else { return }
+                    didBootstrap = true
+                    bootstrap()
+                }
         }
         .menuBarExtraStyle(.window)
         .commands {
             CommandGroup(replacing: .appSettings) {
                 Button("Settings…") {
-                    SettingsOpener.open()
+                    SettingsOpener.open(viewModel: viewModel)
                 }
                 .keyboardShortcut(",", modifiers: .command)
             }
@@ -40,9 +43,9 @@ struct LyricalApp: App {
     @MainActor
     private func bootstrap() {
         appDelegate.viewModel = viewModel
-        lyricsController.attach(to: viewModel)
-        settingsController.attach(to: viewModel)
-        SettingsOpener.configure(controller: settingsController)
+        appDelegate.lyricsController.attach(to: viewModel)
+        appDelegate.settingsController.attach(to: viewModel)
+        SettingsOpener.configure(controller: appDelegate.settingsController)
         auth.restoreSessionIfNeeded()
         if auth.isAuthenticated {
             viewModel.startPolling()

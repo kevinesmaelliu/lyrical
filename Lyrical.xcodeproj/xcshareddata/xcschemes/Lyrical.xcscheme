@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "9F69BE14098F43649A967E93"
-               BuildableName = "Lyrical.app"
+               BuildableName = "Lyrics Anywhere.app"
                BlueprintName = "Lyrical"
                ReferencedContainer = "container:Lyrical.xcodeproj">
             </BuildableReference>
@@ -44,7 +44,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "9F69BE14098F43649A967E93"
-            BuildableName = "Lyrical.app"
+            BuildableName = "Lyrics Anywhere.app"
             BlueprintName = "Lyrical"
             ReferencedContainer = "container:Lyrical.xcodeproj">
          </BuildableReference>
@@ -61,7 +61,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "9F69BE14098F43649A967E93"
-            BuildableName = "Lyrical.app"
+            BuildableName = "Lyrics Anywhere.app"
             BlueprintName = "Lyrical"
             ReferencedContainer = "container:Lyrical.xcodeproj">
          </BuildableReference>

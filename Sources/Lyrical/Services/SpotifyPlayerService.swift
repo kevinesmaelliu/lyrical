@@ -9,6 +9,10 @@ actor SpotifyPlayerService {
 
     func fetchNowPlaying() async throws -> NowPlaying? {
         let token = try await auth.refreshTokenIfNeeded()
+        return try await fetchNowPlaying(with: token)
+    }
+
+    private func fetchNowPlaying(with token: String, retryOnUnauthorized: Bool = true) async throws -> NowPlaying? {
         var request = URLRequest(url: URL(string: "https://api.spotify.com/v1/me/player/currently-playing")!)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
 
@@ -17,7 +21,11 @@ actor SpotifyPlayerService {
 
         if http.statusCode == 204 { return nil }
         if http.statusCode == 401 {
-            throw SpotifyError.notAuthenticated
+            guard retryOnUnauthorized else {
+                throw SpotifyError.notAuthenticated
+            }
+            let refreshedToken = try await auth.forceRefreshAccessToken()
+            return try await fetchNowPlaying(with: refreshedToken, retryOnUnauthorized: false)
         }
         guard http.statusCode == 200 else { return nil }
 

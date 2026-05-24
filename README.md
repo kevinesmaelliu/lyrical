@@ -1,4 +1,4 @@
-# Lyrical
+# Lyrics Anywhere
 
 A minimal macOS menu bar app that shows **synced Spotify lyrics** in a clean floating window — inspired by [Lyricly](https://lyricly-website.vercel.app/).
 
@@ -42,7 +42,18 @@ open Lyrical.xcodeproj
 
 Press **⌘R** to run. The menu bar icon appears; the lyrics window opens automatically.
 
-**Alternative (Swift Package Manager):**
+**Release build & DMG (for distribution):**
+
+```bash
+# Requires full Xcode (not Command Line Tools only)
+cp Config/Secrets.xcconfig.example Config/Secrets.xcconfig   # if needed
+./scripts/build-dmg.sh
+# → Lyrics Anywhere.dmg (Release, with app icon; upload to GitHub Releases)
+```
+
+Use `./scripts/build-app.sh` for a local Release `.app` only. Do **not** ship the output of `swift build` or an Xcode **Debug** build (Finder shows “Debug” under the name).
+
+**Alternative (Swift Package Manager, development only):**
 
 ```bash
 swift build && swift run

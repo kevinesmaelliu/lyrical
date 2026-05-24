@@ -11,7 +11,7 @@ struct ConnectSpotifyExplanationView: View {
             Text("Connect Spotify")
                 .font(compact ? .headline : .title2.weight(.semibold))
 
-            Text("Lyrical needs permission to see what’s playing so it can sync lyrics.")
+            Text("Lyrics Anywhere needs permission to see what’s playing so it can sync lyrics.")
                 .font(compact ? .caption : .body)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
